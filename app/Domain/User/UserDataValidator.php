@@ -16,25 +16,37 @@ class UserDataValidator implements UserDataValidatorInterface
 
     public function validateId(string $id): void
     {
-        /*
-            TODO: validate id using UUID v4 pattern
-        */
+        if (!preg_match(self::UUID_REGEX, $id)) {
+            throw new DataValidationException('The user id is not valid');
+        }
     }
 
     public function validateName(string $name): void
     {
-        
+        if (empty(trim($name))) {
+            throw new DataValidationException('The user name cannot be empty');
+        } elseif (strlen(trim($name)) > self::NAME_MAX_LEGTH) {
+            throw new DataValidationException('The user name exceeds the max length');
+        }
     }
 
     public function validateEmail(string $email): void
-    {
-        
-    }
+{
+    if (empty(trim($email))) {
+        throw new DataValidationException('The user email cannot be empty');
+    } elseif (strlen(trim($email)) > self::EMAIL_MAX_LEGTH) { // Verifica o comprimento primeiro
+        throw new DataValidationException('The user email exceeds the max length');
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { // Depois verifica o formato
+        throw new DataValidationException('The user email is not valid');
+    } 
+}
 
     public function validateCpf(string $cpf): void
     {
         $trimmedCpf = trim($cpf);
-
+        if (empty($trimmedCpf)) {
+            throw new DataValidationException('The user cpf cannot be empty');
+        }
         if (!(new Cpf($trimmedCpf))->isValid()) {
             throw new DataValidationException('The user cpf is not valid');
         }
@@ -42,12 +54,20 @@ class UserDataValidator implements UserDataValidatorInterface
 
     public function validateDateCreation(string $dateCreation): void
     {
-        
+        if (empty(trim($dateCreation))) {
+            throw new DataValidationException('The user date creation cannot be empty');
+        } elseif (!\DateTime::createFromFormat('Y-m-d H:i:s', $dateCreation)) {
+            throw new DataValidationException('The user date creation is not in a valid format');
+        }
     }
 
     public function validateDateEdition(string $dateEdition): void
     {
-       
+        if (empty(trim($dateEdition))) {
+            throw new DataValidationException('The user date edition cannot be empty');
+        } elseif (!\DateTime::createFromFormat('Y-m-d H:i:s', $dateEdition)) {
+            throw new DataValidationException('The user date edition is not in a valid format');
+        }
     }
 
     public function isEligibleForLoan(User $user): bool
