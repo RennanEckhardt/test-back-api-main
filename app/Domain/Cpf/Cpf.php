@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domain\Cpf;
+use App\Exceptions\DataValidationException; 
 
 /*
 Original code to CPF validation:
@@ -15,13 +16,25 @@ class Cpf
 
     public function __construct(string $cpf)
     {
+        $cpf = trim($cpf);
+
+        if (!ctype_digit($cpf)) {
+            throw new DataValidationException('The user cpf is not valid');
+        }
+
+        if (strlen($cpf) !== 11) { 
+            throw new DataValidationException('The user cpf is not valid');
+        }
+
         $this->cpf = $cpf;
     }
 
     public function isValid(): bool
     {
         $isValidLength = $this->isValidLength();
+        
         $isValidNumber = $this->isValidNumber();
+
         return $isValidLength && $isValidNumber;
     }
 
@@ -42,18 +55,15 @@ class Cpf
             return false;
         }
     
-        $sum = 0;
-        for ($i = 0; $i < 9; $i++) {
-            $sum += (10 - $i) * intval($cpf[$i]);
+        for ($t = 9; $t < 11; $t++) {
+            for ($d = 0, $c = 0; $c < $t; $c++) {
+                $d += $cpf[$c] * (($t + 1) - $c);
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cpf[$c] != $d) {
+                return false;
+            }
         }
-        $digit1 = ($sum * 10) % 11;
-    
-        $sum = 0;
-        for ($i = 0; $i < 10; $i++) {
-            $sum += (11 - $i) * intval($cpf[$i]);
-        }
-        $digit2 = ($sum * 10) % 11;
-    
-        return $cpf[9] == $digit1 && $cpf[10] == $digit2;
+        return true;
     }
 }
