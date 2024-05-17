@@ -46,4 +46,12 @@ class UserMemory implements UserPersistenceInterface
     {
 
     }
+
+    public function find(User $user): User{
+        return $user;
+    }
+
+    public function softDelete(User $user): bool{
+        return true;
+    }
 }

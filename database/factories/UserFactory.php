@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Domain\Cpf\CpfGenerator;
 
 class UserFactory extends Factory
 {
@@ -21,10 +22,11 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $cpfGenerator = new CpfGenerator();
         return [
             'uuid' => $this->faker->uuid,
             'name' => $this->faker->name,
-            'cpf' => '11445674084',
+            'cpf' =>  $cpfGenerator->generate(),
             'email' => $this->faker->unique()->safeEmail,
             'created_at' => date('Y-m-d H:i:s'),
         ];

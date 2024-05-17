@@ -23,6 +23,7 @@ class User
     public function __construct(UserPersistenceInterface $persistence)
     {
         $this->persistence = $persistence;
+      //  $this->setDataValidator(new UserDataValidator());
     }
 
     public function setDataValidator(UserDataValidatorInterface $dataValidator): User
@@ -47,7 +48,6 @@ class User
     public function setId(string $id): User
     {
         $this->getDataValidator()->validateId($id);
-
         $this->id = $id;
 
         return $this;
@@ -199,6 +199,7 @@ class User
         $this->persistence->editCpf($this);
     }
 
+    //Utilizando o maximo de poo para que o dominio nao receba informaçoes da infra.
     public function editEmail(): void
     {
         $this->checkExistentId();
@@ -209,4 +210,35 @@ class User
 
         $this->persistence->editEmail($this);
     }
+    public function findById(): User 
+    {
+        if (!$this->persistence->isExistentId($this)) {
+            throw new UserNotFoundException("Usuário não encontrado");
+        }
+        
+        return $this->persistence->find($this); 
+    }
+
+    private function softDelete(): User
+    {
+        if ($this->persistence->softDelete($this)) {
+            throw new UserNotFoundException("Usuário não encontrado.");
+        }
+        return $this;
+    }
+
+    public function removeUser(): user
+    {
+        $this
+            ->findById()
+            ->softDelete()
+        ;
+        return $this;
+    }
+
+    public function exists(): bool
+    {
+        return $this->persistence->isExistentId($this);
+    }
+    
 }

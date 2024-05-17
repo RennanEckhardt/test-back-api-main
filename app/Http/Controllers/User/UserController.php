@@ -525,19 +525,21 @@ class UserController extends Controller
         try {
             $user = new User(new UserDb());
 
-            $userDataValidator = 'find-the-proper-class-to-validate-the-user-data';
+            $userDataValidator = new UserDataValidator();
             $user->setDataValidator($userDataValidator);
 
-            $users = 'find-all-users';
+            $user = new User(new UserDb());
+
+            $users = $user->findAll();
 
             $csv = new Csv();
 
-            $csvDataValidator = 'find-the-proper-class-to-validate-the-csv-data';
+            $csvDataValidator = new CsvDataValidator();;
 
             $csv->setDataValidator($csvDataValidator);
 
             $userSpreadsheet = new UserSpreadsheet();
-
+            dd($users);
             $userSpreadsheet
                 ->setUsers($users)
                 ->setCsv($csv)
@@ -556,4 +558,58 @@ class UserController extends Controller
             throw $e;
         }
     }
+
+  
+    public function getUserById(string $id): JsonResponse
+    {
+        try {
+            $user = (new User(new UserDb()))
+                ->setDataValidator(new UserDataValidator())
+                ->setId($id)
+                ->findById()
+            ; 
+
+            return $this->buildSuccessResponse($this->buildResponse($user));
+        } catch (UserNotFoundException $e) {
+            return $this->buildBadRequestResponse($e->getMessage());
+        } catch (\Exception $e) {
+            throw $e; 
+        }
+    }
+    
+    public function buildResponse(User $user): array
+    {
+        $arrayResponse=[
+            'uuid' => $user->getId(),
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'cpf' => $user->getCpf(),
+            'eligible_for_loan' => $user->getDataValidator()->isEligibleForLoan($user) 
+
+        ];
+        return $arrayResponse;
+    }
+
+
+    public function deleteUser(string $id): JsonResponse
+    {
+        try {
+            $user = (new User(new UserDb()))
+                ->setDataValidator(new UserDataValidator())
+                ->setId($id)
+                ->removeUser();
+            ;
+
+
+            return $this->buildSuccessResponse([
+                'id' => $user->getId(), 
+                'cpf' => $user->getCpf() 
+            ]);
+        } catch (UserNotFoundException $e) {
+            return $this->buildBadRequestResponse($e->getMessage());
+        } catch (\Exception $e) {
+            throw $e; 
+        }
+    }
+
 }

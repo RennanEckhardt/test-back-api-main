@@ -3,6 +3,7 @@
 namespace App\Domain\User;
 
 use App\Domain\Cpf\Cpf;
+use App\Domain\LoanEligibility\UserLoanEligibility;
 use App\Exceptions\DataValidationException;
 
 class UserDataValidator implements UserDataValidatorInterface
@@ -48,4 +49,11 @@ class UserDataValidator implements UserDataValidatorInterface
     {
        
     }
+
+    public function isEligibleForLoan(User $user): bool
+    {
+        $eligibilityChecker = new UserLoanEligibility();
+        return $eligibilityChecker->isEligible($user);
+    }
+    
 }

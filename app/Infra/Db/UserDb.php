@@ -6,6 +6,8 @@ use App\Domain\User\User;
 use App\Domain\User\UserDataValidator;
 use App\Domain\User\UserPersistenceInterface;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\UserNotFoundException;
+
 
 class UserDb implements UserPersistenceInterface
 {
@@ -116,4 +118,41 @@ class UserDb implements UserPersistenceInterface
             ])
         ;
     }
+
+    public function find(User $user): User
+    {
+        $record = (array) DB::table(self::TABLE_NAME)
+            ->where([
+                self::COLUMN_UUID => $user->getId(),
+                self::COLUMN_DELETED_AT => null
+            ]) 
+            ->first()
+        ; 
+        if (!$record) {
+            throw new UserNotFoundException("Usuário já deletado");
+        }
+        
+        $user
+            ->setId($record[self::COLUMN_UUID])
+            ->setName($record[self::COLUMN_NAME])
+            ->setEmail($record[self::COLUMN_EMAIL])
+            ->setCpf($record[self::COLUMN_CPF])
+            ->setDateCreation($record[self::COLUMN_CREATED_AT])
+        ;
+
+        return $user; 
+    }
+
+    public function softDelete(User $user): bool
+    { 
+        $testereturn = DB::table(self::TABLE_NAME)
+            ->where(self::COLUMN_UUID, $user->getId())
+            ->update([
+                self::COLUMN_DELETED_AT => date('Y-m-d H:i:s')
+            ])
+        ;
+            
+        return $testereturn == 0;
+    }
+
 }
