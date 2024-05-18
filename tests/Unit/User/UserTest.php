@@ -240,4 +240,30 @@ class UserTest extends TestCase
 
         $this->assertNotEmpty($user->getName());
     }
+
+    public function testRemoveUser(): void
+    {
+        $user = (new User(new UserMemory()))
+            ->setDataValidator(new UserDataValidator())
+            ->setId($this->faker->uuid())
+            ->setName($this->faker->name())
+            ->setEmail($this->faker->email())
+            ->setCpf(self::VALID_CPF)
+        ;
+        $user->removeUser();
+        $this->assertNotEmpty($user->getDeletedAt());
+    }
+
+    public function testUserFindId(): void
+    {
+        $user = (new User(new UserMemory()))
+            ->setDataValidator(new UserDataValidator())
+            ->setId($this->faker->uuid())
+        ;
+        $user->findById();
+        $this->assertNotEmpty($user->getId());
+        $this->assertNotEmpty($user->getName());
+        $this->assertNotEmpty($user->getEmail());
+        $this->assertNotEmpty($user->getCpf());
+    }
 }

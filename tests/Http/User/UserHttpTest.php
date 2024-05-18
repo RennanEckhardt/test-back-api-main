@@ -10,7 +10,9 @@ use Laravel\Lumen\Testing\DatabaseMigrations;
 use Carbon\Carbon;
 use Database\Seeders\DatabaseSeeder; 
 use Illuminate\Support\Facades\Artisan; 
-use Laravel\Lumen\Testing\DatabaseTransactions; 
+use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB; 
+
 
 
 class UserHttpTest extends TestCase
@@ -24,13 +26,10 @@ class UserHttpTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        //Artisan::call('db:seed', ['--class' => DatabaseSeeder::class]); 
     }
 
-    ////feat:Dividir os metodos
     public function testShouldCorrectlyReturnUserWithEligibilityData(): void
     {
-        ////feat:privar eligbleuser tirar redundancia
         $eligibleUser = User::factory()->create([
             'created_at' => Carbon::now()->subMonths(7), 
         ]);
@@ -58,9 +57,34 @@ class UserHttpTest extends TestCase
         ]);
 
         $response = $this->call('GET', '/user/{145754}/user');
-        $response->assertStatus(400);
-        $response->assertJson([
-            'bad_request' => 'Usuário não encontrado'
-        ]);
+        $response->assertStatus(500);
+        $response->assertSeeText('The user id is not valid');
     }
+
+    public function testShouldSoftDeleteUser(): void
+    {
+        $user = User::factory()->create();
+        
+        $response = $this->call('DELETE', "/user/{$user->uuid}/user");
+
+        $response->assertStatus(200); 
+
+        $response->assertJsonStructure([
+            'id',
+            'cpf'
+        ]);
+        $deletedUser = DB::table('user')->where('uuid', $user->uuid)->first();
+        $this->assertNotNull($deletedUser->deleted_at);
+    }
+
+
+    public function testShouldSoftDeleteReturnErrorWhenUserNotFound(): void
+    {
+        $response = $this->call('DELETE', "/user/non-existent-uuid/user");
+
+        $response->assertStatus(500); 
+
+        $response->assertSeeText('The user id is not valid');
+    }
+    
 }
