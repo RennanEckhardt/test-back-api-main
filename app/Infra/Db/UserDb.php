@@ -49,7 +49,7 @@ class UserDb implements UserPersistenceInterface
     }
 
     public function findAll(User $user): array
-    {
+    {   
         $users = [];
 
         $records = DB::table(self::TABLE_NAME)
@@ -64,7 +64,7 @@ class UserDb implements UserPersistenceInterface
             ])
             ->get()
         ;
-
+        
         foreach ($records as $record) {
             $users[] = (new User(new UserDb()))
                 ->setDataValidator(new UserDataValidator())
@@ -74,7 +74,6 @@ class UserDb implements UserPersistenceInterface
                 ->setEmail($record->email)
             ;
         }
-
         return $users;
     }
 
@@ -129,7 +128,7 @@ class UserDb implements UserPersistenceInterface
             ->first()
         ; 
         if (!$record) {
-            throw new UserNotFoundException("Usuário já deletado");
+            throw new UserNotFoundException("Usuario ja deletado");
         }
         
         $user
