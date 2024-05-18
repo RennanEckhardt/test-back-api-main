@@ -15,6 +15,7 @@ class User
     private string $cpf;
     private string $dateCreation;
     private string $dateEdition;
+    private string $deletedAt;
 
     private UserDataValidatorInterface $dataValidator;
     private UuidGeneratorInterface $uuidGenerator;
@@ -23,7 +24,6 @@ class User
     public function __construct(UserPersistenceInterface $persistence)
     {
         $this->persistence = $persistence;
-      //  $this->setDataValidator(new UserDataValidator());
     }
 
     public function setDataValidator(UserDataValidatorInterface $dataValidator): User
@@ -128,6 +128,20 @@ class User
         return $this->dateEdition;
     }
 
+    public function setDeletedAt (string $deletedAt): User
+    {
+        $this->getDataValidator()->validateDateEdition($deletedAt);
+
+        $this->deletedAt = $deletedAt;
+
+        return $this;                         
+    }
+
+    public function getDeletedAt(): string
+    {
+        return $this->deletedAt;
+    }
+
     public function generateId(): User
     {
         $this->id = $this->uuidGenerator->generate();
@@ -211,16 +225,15 @@ class User
         $this->persistence->editEmail($this);
     }
     public function findById(): User 
-    {
+    {   
         if (!$this->persistence->isExistentId($this)) {
             throw new UserNotFoundException("Usuário não encontrado");
         }
-        
         return $this->persistence->find($this); 
     }
 
     private function softDelete(): User
-    {
+    {  
         if ($this->persistence->softDelete($this)) {
             throw new UserNotFoundException("Usuário não encontrado.");
         }
