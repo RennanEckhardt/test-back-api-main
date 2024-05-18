@@ -539,13 +539,12 @@ class UserController extends Controller
             $csv->setDataValidator($csvDataValidator);
 
             $userSpreadsheet = new UserSpreadsheet();
-            dd($users);
             $userSpreadsheet
                 ->setUsers($users)
                 ->setCsv($csv)
             ;
 
-            $content = 'find-the-way-to-build-the-content';
+            $content = $userSpreadsheet->buildContentFromUsers();
 
             return $this->buildSuccessResponse([
                 'csv' => $content
@@ -559,7 +558,61 @@ class UserController extends Controller
         }
     }
 
-  
+    /**
+     * @OA\Get(
+     *     path="/user/{id}/user",
+     *     summary="Retorna os dados de um usuário específico por ID",
+     *     tags={"User"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Id do usuário",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             default=""
+     *         )
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Created",
+     *          content={
+     *             @OA\MediaType(
+     *                 mediaType="application/json",
+     *                 @OA\Schema(
+     *                     @OA\Property(
+     *                         property="uuid",
+     *                         type="string",
+     *                     ),
+     *                     @OA\Property(
+     *                         property="name",
+     *                         type="string",
+     *                     ),
+     *                     @OA\Property(
+     *                         property="email",
+     *                         type="string",
+     *                     ),
+     *                     @OA\Property(
+     *                         property="cpf",
+     *                         type="string",
+     *                     ),
+     *                     @OA\Property(
+     *                         property="eligible_for_loan",
+     *                         type="bool",
+     *                     ),
+     *                     example={
+     *                         "uuid": "d229481f-a02a-37ec-9d7b-f46674cde6c1",
+     *                         "email": "rquigley@example.org",
+     *                         "name": "Mina Howell",
+     *                         "cpf": "10030830303",
+     *                         "eligible_for_loan": false
+     *                     }
+     *                 )
+     *             )
+     *         }
+     *     ),
+     * )
+     */
     public function getUserById(string $id): JsonResponse
     {
         try {
@@ -591,6 +644,46 @@ class UserController extends Controller
     }
 
 
+    /**
+     * @OA\Delete(
+     *     path="/user/{id}/user",
+     *     summary="Responsável por realizar a remoção (soft delete) de um usuário registrado no Banco de Dados",
+     *     tags={"User"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Id do usuário",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             default=""
+     *         )
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="sucesse soft delete",
+     *          content={
+     *             @OA\MediaType(
+     *                 mediaType="application/json",
+     *                 @OA\Schema(
+     *                     @OA\Property(
+     *                         property="cpf",
+     *                         type="string",
+     *                     ),
+     *                     @OA\Property(
+     *                         property="id",
+     *                         type="string",
+     *                     ),
+     *                     example={
+     *                         "id": "d229481f-a02a-37ec-9d7b-f46674cde6c1",
+     *                         "cpf": "10030830303"
+     *                     }
+     *                 )
+     *             )
+     *         }
+     *     ),
+     * )
+     */
     public function deleteUser(string $id): JsonResponse
     {
         try {
