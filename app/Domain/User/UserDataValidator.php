@@ -34,9 +34,9 @@ class UserDataValidator implements UserDataValidatorInterface
 {
     if (empty(trim($email))) {
         throw new DataValidationException('The user email cannot be empty');
-    } elseif (strlen(trim($email)) > self::EMAIL_MAX_LEGTH) { // Verifica o comprimento primeiro
+    } elseif (strlen(trim($email)) > self::EMAIL_MAX_LEGTH) { 
         throw new DataValidationException('The user email exceeds the max length');
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { // Depois verifica o formato
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { 
         throw new DataValidationException('The user email is not valid');
     } 
 }

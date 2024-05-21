@@ -10,6 +10,25 @@ use Faker;
 class UserMemory implements UserPersistenceInterface
 {
     private Faker\Generator $faker;
+
+    public function find(User $user): User{
+        $this->faker = Faker\Factory::create();
+        $cpf = new CpfGenerator();
+        $user
+            ->setDataValidator(new UserDataValidator())
+            ->setId($this->faker->uuid())
+            ->setName($this->faker->name())
+            ->setEmail($this->faker->email())
+            ->setCpf($cpf->generate())
+        
+        ;
+        return $user;
+    }
+
+    public function softDelete(User $user): bool{
+        $user->setDeletedAt(date('Y-m-d H:i:s'));
+        return false;
+    }
     
     public function create(User $user): void
     {
@@ -51,22 +70,4 @@ class UserMemory implements UserPersistenceInterface
 
     }
 
-    public function find(User $user): User{
-        $this->faker = Faker\Factory::create();
-        $cpf = new CpfGenerator();
-        $user
-            ->setDataValidator(new UserDataValidator())
-            ->setId($this->faker->uuid())
-            ->setName($this->faker->name())
-            ->setEmail($this->faker->email())
-            ->setCpf($cpf->generate())
-        
-        ;
-        return $user;
-    }
-
-    public function softDelete(User $user): bool{
-        $user->setDeletedAt(date('Y-m-d H:i:s'));
-        return false;
-    }
 }

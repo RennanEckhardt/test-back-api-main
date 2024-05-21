@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Domain\User;
-////Persistence criado para cada class
+
 interface UserPersistenceInterface
 {
     public function create(User $user): void;
