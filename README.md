@@ -1,7 +1,7 @@
 <p align="center"><a href="https://emcash.com.br/" target="_blank"><img src="https://emcash.com.br/wp-content/uploads/2023/03/emcash-logo_ALTA-01.png" width="600" alt="Emcash"></a></p>
 
 # Here are some tips to start
-
+#LINK PARA DOCUMENTAÇAO SOBRE O TESTE: https://docs.google.com/document/d/1Nsi9MD8l0KuXti3LsABlCFGeY60YrPl0R8UqXAjZ0qM/edit?usp=sharing
 * This project utilizes Laravel Lumen
 
 * You will need composer, docker and docker compose installed
